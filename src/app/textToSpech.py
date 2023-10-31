@@ -1,24 +1,57 @@
 import os
+import subprocess
+import unittest
+from dataclasses import dataclass
 
 import gtts
 
+__all__ = ("TextToSpeechConverter",)
 
-def texto_a_voz(texto: str, archivo_salida: str):
-    """Convierte un texto a voz y lo guarda en un archivo de audio.
 
-    Parameters
-    ----------
-    texto : str
-        Texto a convertir a voz.
-    archivo_salida : str
-        Dirección del archivo de salida.
-    """
-    tts = gtts.gTTS(text=texto, lang="es")
+@dataclass(slots=True, frozen=True)
+class TextToSpeechConverter:
+    text: str
+    output_file: str = "output.mp3"
 
-    try:
-        tts.save(archivo_salida)
-    except gtts.gTTSError:
-        print("Error al generar el archivo de audio")
-    else:
-        # Reproduce el archivo de audio (opcional)
-        os.system(f"start {archivo_salida}")  # En Windows
+    def convert_to_audio(self):
+        """Convert text to audio"""
+        tts = gtts.gTTS(text=self.text, lang="es")
+        with open(self.output_file, "wb") as f:
+            tts.write_to_fp(f)
+
+    def play_audio(self):
+        """Play audio file"""
+        if os.name == "nt":
+            subprocess.run(
+                ["start", self.output_file],
+                shell=True,
+                check=True,
+            )
+        else:
+            subprocess.run(
+                ["xdg-open", self.output_file],
+                check=True,
+            )
+
+
+class TestTextToSpeechConverter(unittest.TestCase):
+    def test_convert_to_audio(self):
+        texto = "Hola mundo"
+        archivo_salida = "test.mp3"
+
+        converter = TextToSpeechConverter(texto, archivo_salida)
+        converter.convert_to_audio()
+        self.assertTrue(os.path.exists(archivo_salida))
+        os.remove(archivo_salida)
+
+    def test_play_audio(self):
+        texto = "Hola mundo"
+        archivo_salida = "test.mp3"
+
+        converter = TextToSpeechConverter(texto, archivo_salida)
+        converter.convert_to_audio()
+        converter.play_audio()
+
+
+if __name__ == "__main__":
+    unittest.main()
