@@ -1,5 +1,6 @@
 import os
 import subprocess
+import tempfile
 import time
 import unittest
 from dataclasses import dataclass
@@ -9,7 +10,7 @@ import gtts
 __all__ = ("TextToSpeechConverter",)
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, unsafe_hash=True)
 class TextToSpeechConverter:
     text: str
     output_file: str = "output.mp3"
@@ -26,14 +27,17 @@ class TextToSpeechConverter:
         with open(self.output_file, "wb") as f:
             tts.write_to_fp(f)
 
+    def convert_to_temporal_audio(self):
+        """Realiza la conversión de texto a audio y lo guarda en un archivo temporal"""
+        tts = gtts.gTTS(text=self.text, lang="es")
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
+            tts.write_to_fp(f)
+            self.output_file = f.name
+
     def play_audio(self):
         """Reproduce el archivo de audio"""
         if os.name == "nt":
-            subprocess.run(
-                ["start", self.output_file],
-                shell=True,
-                check=True,
-            )
+            os.startfile(self.output_file, "open")
         else:
             subprocess.run(
                 ["xdg-open", self.output_file],
@@ -46,21 +50,11 @@ class TextToSpeechConverter:
             return print(f"{self.output_file} no ha sido creado")
 
         try:
-            if os.name == "nt":
-                subprocess.run(
-                    ["del", self.output_file],
-                    shell=True,
-                    check=True,
-                )
-            else:
-                subprocess.run(
-                    ["rm", self.output_file],
-                    check=True,
-                )
+            os.remove(self.output_file)
+        except FileNotFoundError:
+            print(f"El archivo {self.output_file} no existe")
         except Exception as e:
             print(f"Error al eliminar el archivo {self.output_file}: {e}")
-        else:
-            print(f"Archivo {self.output_file!r} eliminado")
 
 
 class TestTextToSpeechConverter(unittest.TestCase):
@@ -72,6 +66,10 @@ class TestTextToSpeechConverter(unittest.TestCase):
     def test_convert_to_audio(self):
         self.converter.convert_to_audio()
         self.assertTrue(os.path.exists(self.output_file))
+
+    def test_convert_to_temporal_audio(self):
+        self.converter.convert_to_temporal_audio()
+        self.assertTrue(os.path.exists(self.converter.output_file))
 
     def test_play_audio(self):
         self.converter.convert_to_audio()

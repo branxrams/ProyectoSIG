@@ -12,6 +12,7 @@ gtts = "^2.4.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.10.1"
+isort = "^5.12.0"
 
 [build-system]
 requires = ["poetry-core"]
