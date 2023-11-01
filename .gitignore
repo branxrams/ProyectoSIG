@@ -6,6 +6,11 @@ service-account-key.json
 .history/
 *.bak
 
+/*.png
+/prueba2.jpg
+/*.mp4
+/*.dat
+
 # Local History for Pycharm
 .idea/
 
