@@ -11,7 +11,6 @@ import cv2
 import numpy as np
 from pydub import AudioSegment
 from moviepy.editor import VideoFileClip, AudioFileClip
-import time
 
 class AudioImageAnimator:
     def __init__(self, image_path, audio_path, output_path):
