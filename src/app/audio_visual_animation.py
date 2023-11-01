@@ -1,12 +1,3 @@
-"""
-    Librerias a instalar
-    numpy, 
-    opencv-python, 
-    pydub
-    moviepy
-    instalar FFmpeg
-"""
-
 import cv2
 import numpy as np
 from moviepy.editor import AudioFileClip, VideoFileClip, VideoClip
@@ -97,7 +88,7 @@ class TalkingHeadAnimator:
         audio_volume = audio_chunk.rms
 
         # Determina el radio del círculo de la boca en función del volumen del audio
-        mouth_radius = int(5 + audio_volume / 400) # para un diametro de 10
+        mouth_radius = int(10 + audio_volume / 400) # para un diametro de 15
 
         # Convierte la imagen a formato BGR
         animated_image = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
@@ -120,12 +111,8 @@ if __name__ == "__main__":
     output_path = "video_prueba.mp4"
     output_sound_path = "video_con_audio.mp4"
 
-    #animator = AudioImageAnimator(image_path, audio_path, output_path)
-    #animator.create_animation()
-    # animator.show_animation()
-
-    animator_mouth = TalkingHeadAnimator(image_path, audio_path, output_path)
-    animator_mouth.create_animation()
+    animator = TalkingHeadAnimator(image_path, audio_path, output_path)
+    animator.create_animation()
 
     output_sound_path = "video_con_audio.mp4"
 
