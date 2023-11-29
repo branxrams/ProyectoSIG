@@ -104,10 +104,10 @@ class TalkingHeadAnimator:
         video_clip.set_duration(self.audio.duration_seconds).write_videofile(self.output_path, codec='libx264')
 
 
-
+"""
 if __name__ == "__main__":
     image_path = "prueba1.jpg"
-    audio_path = "audio_prueba.mp3"
+    audio_path = "test.mp3"
     output_path = "video_prueba.mp4"
     output_sound_path = "video_con_audio.mp4"
 
@@ -118,3 +118,4 @@ if __name__ == "__main__":
 
     combiner = VideoAudioCombiner(output_path, audio_path)
     combiner.combine_audio_with_video(output_sound_path)
+"""
