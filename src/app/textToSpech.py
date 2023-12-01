@@ -5,17 +5,19 @@ import time
 import unittest
 from dataclasses import dataclass
 
-from audio_visual_animation import TalkingHeadAnimator, VideoAudioCombiner
+#from audio_visual_animation import TalkingHeadAnimator, VideoAudioCombiner
 
 import gtts
 
 __all__ = ("TextToSpeechConverter",)
 
 
+mensaje1 = ""
+
 @dataclass(slots=True, unsafe_hash=True)
 class TextToSpeechConverter:
     text: str
-    output_file: str = "output.mp3"
+    output_file: str = "output.mp3" 
 
     def __post_init__(self):
         """Verfica si el archivo de salida existe, si existe le agrega un timestamp al nombre del archivo"""
@@ -31,7 +33,7 @@ class TextToSpeechConverter:
 
     def convert_to_temporal_audio(self):
         """Realiza la conversión de texto a audio y lo guarda en un archivo temporal"""
-        tts = gtts.gTTS(text=self.text, lang="es")
+        tts = gtts.gTTS(text=self.text, lang="es", tld='com', slow=False)
         with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
             tts.write_to_fp(f)
             self.output_file = f.name
@@ -61,10 +63,10 @@ class TextToSpeechConverter:
 
 class TestTextToSpeechConverter(unittest.TestCase):
     def setUp(self):
-        self.text = "Hola mundo"
+        self.text = mensaje1
         self.output_file = "output.mp3"
         self.converter = TextToSpeechConverter(self.text, self.output_file)
-
+    
     def test_convert_to_audio(self):
         self.converter.convert_to_audio()
         self.assertTrue(os.path.exists(self.output_file))
@@ -79,7 +81,6 @@ class TestTextToSpeechConverter(unittest.TestCase):
     
     def tearDown(self):
         pass
-    
 
 def run_tests_and_additional_code():
     # Ejecutar las pruebas
@@ -88,6 +89,7 @@ def run_tests_and_additional_code():
     runner = unittest.TextTestRunner()
     result = runner.run(suite)
 
+    """
     # Verificar si las pruebas fueron exitosas antes de continuar con el código adicional
     if result.wasSuccessful():
         image_path = "prueba1.jpg"
@@ -110,7 +112,7 @@ def run_tests_and_additional_code():
     for file_name in os.listdir("."):
         if file_name.endswith(".mp3"):
             os.remove(file_name)
-
+    """
 
 if __name__ == "__main__":
     run_tests_and_additional_code()

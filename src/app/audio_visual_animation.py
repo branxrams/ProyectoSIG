@@ -1,3 +1,4 @@
+#import os
 import cv2
 import numpy as np
 from moviepy.editor import AudioFileClip, VideoFileClip, VideoClip
@@ -107,7 +108,7 @@ class TalkingHeadAnimator:
 """
 if __name__ == "__main__":
     image_path = "prueba1.jpg"
-    audio_path = "test.mp3"
+    audio_path = "output.mp3"
     output_path = "video_prueba.mp4"
     output_sound_path = "video_con_audio.mp4"
 
@@ -118,4 +119,12 @@ if __name__ == "__main__":
 
     combiner = VideoAudioCombiner(output_path, audio_path)
     combiner.combine_audio_with_video(output_sound_path)
+
+for file_to_delete in ["output.mp3", "video_prueba.mp4"]:
+    if os.path.exists(file_to_delete):
+        os.remove(file_to_delete)
+    
+    for file_name in os.listdir("."):
+        if file_name.endswith(".mp3"):
+            os.remove(file_name)
 """
