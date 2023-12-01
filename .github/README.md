@@ -1,3 +1,3 @@
-# Proyecto Seminario de Investigación
+# Proyecto FONDUCAR - Sistemas de Informacion Gerencial
 
 ---
