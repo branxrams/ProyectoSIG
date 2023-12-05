@@ -1,0 +1,28 @@
+name: Elegantly Organize Imports
+
+on: [push]
+
+jobs:
+  beautify-imports:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # Setup the latest Python 3.11 version
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      # Install Poetry
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python -
+
+      # Install dependencies using Poetry
+      - name: Install dependencies
+        run: poetry install
+
+      # Run isort with the black profile
+      - name: Run isort
+        run: poetry run isort . --profile black --target-version py310
