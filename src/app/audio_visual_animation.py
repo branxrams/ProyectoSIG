@@ -1,7 +1,7 @@
-#import os
+# import os
 import cv2
 import numpy as np
-from moviepy.editor import AudioFileClip, VideoFileClip, VideoClip
+from moviepy.editor import AudioFileClip, VideoClip, VideoFileClip
 from pydub import AudioSegment
 
 
@@ -18,9 +18,7 @@ class AudioImageAnimator:
         num_frames = int(frame_rate * audio_duration)
 
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
-        video = cv2.VideoWriter(
-            self.output_path, fourcc, frame_rate, (image_width, image_height)
-        )
+        video = cv2.VideoWriter(self.output_path, fourcc, frame_rate, (image_width, image_height))
 
         for i in range(num_frames):
             start_time = i * (len(self.audio) / num_frames)
@@ -78,6 +76,7 @@ class VideoAudioCombiner:
         video_clip.close()
         audio_clip.close()
 
+
 class TalkingHeadAnimator:
     def __init__(self, image_path, audio_path, output_path):
         self.image = cv2.imread(image_path)
@@ -85,11 +84,11 @@ class TalkingHeadAnimator:
         self.output_path = output_path
 
     def animate_mouth(self, t):
-        audio_chunk = self.audio[t * 1000:(t + 1) * 1000]
+        audio_chunk = self.audio[t * 1000 : (t + 1) * 1000]
         audio_volume = audio_chunk.rms
 
         # Determina el radio del círculo de la boca en función del volumen del audio
-        mouth_radius = int(10 + audio_volume / 400) # para un diametro de 15
+        mouth_radius = int(10 + audio_volume / 400)  # para un diametro de 15
 
         # Convierte la imagen a formato BGR
         animated_image = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
@@ -102,7 +101,7 @@ class TalkingHeadAnimator:
     def create_animation(self):
         video_clip = VideoClip(self.animate_mouth, duration=self.audio.duration_seconds)
         video_clip.fps = 60  # Establece la velocidad de cuadros por segundo
-        video_clip.set_duration(self.audio.duration_seconds).write_videofile(self.output_path, codec='libx264')
+        video_clip.set_duration(self.audio.duration_seconds).write_videofile(self.output_path, codec="libx264")
 
 
 """
