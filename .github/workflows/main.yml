@@ -25,4 +25,4 @@ jobs:
 
       # Run isort with the black profile
       - name: Run isort
-        run: poetry run isort . --profile black --target-version py310
+        run: poetry run isort . --profile black
