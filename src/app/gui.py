@@ -3,8 +3,9 @@
 
 
 import os
-from pathlib import Path
 from distutils.core import setup
+from pathlib import Path
+
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 from tkinter import Button, Canvas, Event, PhotoImage, Text, Tk
@@ -127,7 +128,6 @@ def on_image_click1(event: Event):
     canvas.itemconfig(image_10, state="hidden")
     mensaje = entry_1.get("1.0", "end")
     tts.mensaje1 = mensaje
-    tts.run_tests_and_additional_code()
     entry_1.place_forget()
 
 

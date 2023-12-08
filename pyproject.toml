@@ -11,6 +11,7 @@ moviepy = "^1.0.3"
 pydub = "^0.25.1"
 opencv-python = "^4.8.1.78"
 pyinstaller = "^6.2.0"
+python-dotenv = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
