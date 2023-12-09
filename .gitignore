@@ -6,7 +6,7 @@ service-account-key.json
 .history/
 *.bak
 
-/*.png
+/prueba1.png
 /prueba2.jpg
 /*.mp4
 /*.dat

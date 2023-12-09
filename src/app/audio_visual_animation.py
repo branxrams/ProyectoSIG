@@ -1,24 +1,32 @@
-# import os
+import os
 import cv2
 import numpy as np
-from moviepy.editor import AudioFileClip, VideoClip, VideoFileClip
+from moviepy.editor import AudioFileClip, VideoFileClip, VideoClip
 from pydub import AudioSegment
+import string
 
+text1 = "sssss"
 
 class AudioImageAnimator:
-    def __init__(self, image_path, audio_path, output_path):
+    def __init__(self, image_path, audio_path, output_path, target_height):
         self.image = cv2.imread(image_path)
         self.audio = AudioSegment.from_file(audio_path)
         self.output_path = output_path
+        self.target_height = target_height
 
     def create_animation(self):
+        # Resize the image to have the target height
+        self.image = cv2.resize(self.image, (int(self.target_height * self.image.shape[1] / self.image.shape[0]), self.target_height))
+
         image_height, image_width, _ = self.image.shape
         frame_rate = 30
         audio_duration = len(self.audio) / 1000
         num_frames = int(frame_rate * audio_duration)
 
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
-        video = cv2.VideoWriter(self.output_path, fourcc, frame_rate, (image_width, image_height))
+        video = cv2.VideoWriter(
+            self.output_path, fourcc, frame_rate, (image_width, self.target_height)
+        )
 
         for i in range(num_frames):
             start_time = i * (len(self.audio) / num_frames)
@@ -26,7 +34,7 @@ class AudioImageAnimator:
             audio_chunk = self.audio[start_time:end_time]
             audio_volume = audio_chunk.rms
 
-            displacement = int(image_height / 2 - audio_volume / 2)
+            displacement = int(self.target_height / 2 - audio_volume / 2)
             displaced_image = np.roll(self.image, displacement, axis=0)
 
             video.write(displaced_image)
@@ -76,37 +84,54 @@ class VideoAudioCombiner:
         video_clip.close()
         audio_clip.close()
 
-
 class TalkingHeadAnimator:
     def __init__(self, image_path, audio_path, output_path):
         self.image = cv2.imread(image_path)
         self.audio: AudioSegment = AudioSegment.from_file(audio_path)
         self.output_path = output_path
 
-    def animate_mouth(self, t):
-        audio_chunk = self.audio[t * 1000 : (t + 1) * 1000]
-        audio_volume = audio_chunk.rms
+        # Mapea letras del alfabeto a las imágenes correspondientes de la boca
+        self.mouth_images = {}
+        alphabet = string.ascii_uppercase
+        for letter in alphabet:
+            mouth_image_path = f"src/app/mouth_images/{letter}.png"  # Asegúrate de tener las imágenes adecuadas
+            mouth_image = cv2.imread(mouth_image_path)
+            # Convierte la imagen a formato BGR
+            mouth_image_BGR = cv2.cvtColor(mouth_image, cv2.COLOR_RGB2BGR)
+            # Resize the mouth image to match the dimensions of the base image
+            mouth_image = cv2.resize(mouth_image_BGR, (1000, 1200))
+            self.mouth_images[letter] = mouth_image
 
-        # Determina el radio del círculo de la boca en función del volumen del audio
-        mouth_radius = int(10 + audio_volume / 400)  # para un diametro de 15
+    def animate_mouth(self, t):
+        audio_chunk = self.audio[t * 1000:(t + 1) * 1000]
+        audio_volume = audio_chunk.rms
+        text = text1  # Replace with your actual text
+        text = text.upper()
+
+        # Asegúrate de que el índice esté dentro de los límites válidos
+        alphabet_index = min(int(t / self.audio.duration_seconds * len(text)), len(text) - 1)
+
+        # Obtiene la letra correspondiente al índice
+        letter = text[alphabet_index]
+        # Obtiene la imagen de la boca correspondiente a la letra
+        mouth_image = self.mouth_images.get(letter, self.mouth_images['A'])
 
         # Convierte la imagen a formato BGR
         animated_image = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
 
-        # Dibuja un círculo en la imagen sin cambiar el color
-        cv2.circle(animated_image, (211, 268), mouth_radius, (0, 0, 0), thickness=cv2.FILLED)
+        # Sobrepone la imagen de la boca en toda la imagen base
+        animated_image = mouth_image
 
         return animated_image
 
     def create_animation(self):
         video_clip = VideoClip(self.animate_mouth, duration=self.audio.duration_seconds)
-        video_clip.fps = 60  # Establece la velocidad de cuadros por segundo
-        video_clip.set_duration(self.audio.duration_seconds).write_videofile(self.output_path, codec="libx264")
-
+        video_clip.fps = 30  # Establece la velocidad de cuadros por segundo
+        video_clip.set_duration(self.audio.duration_seconds).write_videofile(self.output_path, codec='libx264')
 
 """
 if __name__ == "__main__":
-    image_path = "prueba1.jpg"
+    image_path = "Base Image.png"
     audio_path = "output.mp3"
     output_path = "video_prueba.mp4"
     output_sound_path = "video_con_audio.mp4"
@@ -126,4 +151,5 @@ for file_to_delete in ["output.mp3", "video_prueba.mp4"]:
     for file_name in os.listdir("."):
         if file_name.endswith(".mp3"):
             os.remove(file_name)
+
 """
