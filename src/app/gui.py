@@ -11,7 +11,9 @@ from pathlib import Path
 from tkinter import Button, Canvas, Event, PhotoImage, Text, Tk
 
 import textToSpech as tts
+from textToSpech import run_tests_and_additional_code
 from audio_visual_animation import TalkingHeadAnimator, VideoAudioCombiner
+import audio_visual_animation
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / "assets/frame0"
@@ -52,10 +54,12 @@ image_5 = canvas.create_image(167.0, 308.0, image=image_image_5)
 # Define a function to handle clicks on the image
 def on_image_click2(event: Event):
     print("Image clicked!")
-    image_path = "prueba1.png"
+    image_path = "Base Image.png"
     audio_path = "output.mp3"
     output_path = "video_prueba.mp4"
     output_sound_path = "video_con_audio.mp4"
+    mensaje = entry_1.get("1.0", "end")
+    audio_visual_animation.text1 = mensaje
 
     animator = TalkingHeadAnimator(image_path, audio_path, output_path)
     animator.create_animation()
@@ -128,6 +132,7 @@ def on_image_click1(event: Event):
     canvas.itemconfig(image_10, state="hidden")
     mensaje = entry_1.get("1.0", "end")
     tts.mensaje1 = mensaje
+    run_tests_and_additional_code()
     entry_1.place_forget()
 
 

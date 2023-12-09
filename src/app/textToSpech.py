@@ -79,7 +79,7 @@ class TextToSpeechConverter:
 
 class TestTextToSpeechConverter(unittest.TestCase):
     def setUp(self):
-        self.text = "Hola mucho gusto, esta es una prueba de voz!"
+        self.text = mensaje1
         self.converter = TextToSpeechConverter(self.text)
 
     def test_convert_to_audio(self):
@@ -95,5 +95,14 @@ class TestTextToSpeechConverter(unittest.TestCase):
         pass
 
 
+def run_tests_and_additional_code():
+    # Ejecutar las pruebas
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestTextToSpeechConverter)
+    runner = unittest.TextTestRunner()
+    result = runner.run(suite)
+
+"""
 if __name__ == "__main__":
     unittest.main()
+"""
