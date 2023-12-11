@@ -1,6 +1,5 @@
 import logging
 import os
-from re import T
 import subprocess
 import time
 import unittest
@@ -8,9 +7,6 @@ from dataclasses import dataclass
 
 import requests
 from dotenv import load_dotenv
-
-from audio_visual_animation import TalkingHeadAnimator, VideoAudioCombiner
-import audio_visual_animation
 
 load_dotenv()
 
@@ -21,9 +17,7 @@ PARAMS = {
     "email": os.getenv("API_EMAIL"),
     "voice": "Bartolo",
 }
-
 mensaje1 = ""
-titulo = ""
 
 
 __all__ = ("TextToSpeechConverter", "message1")
@@ -107,28 +101,7 @@ def run_tests_and_additional_code():
     suite = loader.loadTestsFromTestCase(TestTextToSpeechConverter)
     runner = unittest.TextTestRunner()
     result = runner.run(suite)
-    
-    # Verificar si las pruebas fueron exitosas antes de continuar con el código adicional
-    if result.wasSuccessful():
-        image_path = "Base Image.png"
-        audio_path = "output.mp3"
-        output_path = f"{titulo}_prueba.mp4"
-        output_sound_path = f"{titulo}.mp4"
-        audio_visual_animation.text1 = mensaje1
-        animator = TalkingHeadAnimator(image_path, audio_path, output_path)
-        animator.create_animation()
-        output_sound_path = f"{titulo}.mp4"
-        combiner = VideoAudioCombiner(output_path, audio_path)
-        combiner.combine_audio_with_video(output_sound_path)
-    
-    for file_to_delete in ["output.mp3", f"{titulo}_prueba.mp4"]:
-        if os.path.exists(file_to_delete):
-            os.remove(file_to_delete)
-    
-    for file_name in os.listdir("."):
-        if file_name.endswith(".mp3"):
-            os.remove(file_name)
-    
+
 """
 if __name__ == "__main__":
     unittest.main()
