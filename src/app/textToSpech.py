@@ -110,14 +110,14 @@ def run_tests_and_additional_code():
     
     # Verificar si las pruebas fueron exitosas antes de continuar con el código adicional
     if result.wasSuccessful():
-        image_path = "Base Image.png"
         audio_path = "output.mp3"
-        output_path = f"{titulo}_prueba.mp4"
+        output_path = "video.mp4"
         output_sound_path = f"{titulo}.mp4"
         audio_visual_animation.text1 = mensaje1
-        animator = TalkingHeadAnimator(image_path, audio_path, output_path)
+        audio_visual_animation.title = titulo
+        animator = TalkingHeadAnimator(audio_path, output_path, 10)
         animator.create_animation()
-        output_sound_path = f"{titulo}.mp4"
+        #output_sound_path = f"{titulo}.mp4"
         combiner = VideoAudioCombiner(output_path, audio_path)
         combiner.combine_audio_with_video(output_sound_path)
     

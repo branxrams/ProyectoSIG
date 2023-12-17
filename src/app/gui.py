@@ -125,6 +125,7 @@ entry_2 = Text(
     bd=0,
     bg="#D9D9D9",
     fg="#000716",
+    wrap=WORD,
     highlightthickness=0
 )
 entry_2.place(
