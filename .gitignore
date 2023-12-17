@@ -10,7 +10,10 @@ service-account-key.json
 /prueba2.jpg
 /*.mp4
 /*.dat
-
+textToSpech_copy.py
+mouth_images/
+nel.exe
+nel/
 # Local History for Pycharm
 .idea/
 

@@ -1,11 +1,15 @@
 import os
+import subprocess
 import cv2
 import numpy as np
 from moviepy.editor import AudioFileClip, VideoFileClip, VideoClip
 from pydub import AudioSegment
+import tkinter as tk
+from tkinter import messagebox
 import string
 
 text1 = "sssss"
+title = ""
 
 class AudioImageAnimator:
     def __init__(self, image_path, audio_path, output_path, target_height):
@@ -40,6 +44,12 @@ class AudioImageAnimator:
             video.write(displaced_image)
 
         video.release()
+
+        # Obtiene la ruta completa del video generado
+        video_path = os.path.abspath(title)
+
+        # Muestra una ventana emergente indicando que el video se generó con éxito.
+        messagebox.showinfo("Éxito", f"El video se generó con éxito!\nRuta del video: {video_path}.mp4")
 
     def show_animation(self):
         cap = cv2.VideoCapture(self.output_path)
@@ -85,49 +95,48 @@ class VideoAudioCombiner:
         audio_clip.close()
 
 class TalkingHeadAnimator:
-    def __init__(self, image_path, audio_path, output_path):
-        self.image = cv2.imread(image_path)
-        self.audio: AudioSegment = AudioSegment.from_file(audio_path)
+    def __init__(self, audio_path, output_path, target_duration=10.0):
+        self.images = [cv2.imread(f"src/app/images/{i}.png") for i in range(32)]
+        self.audio = AudioSegment.from_file(audio_path)
         self.output_path = output_path
+        self.target_duration = target_duration
 
-        # Mapea letras del alfabeto a las imágenes correspondientes de la boca
-        self.mouth_images = {}
-        alphabet = string.ascii_uppercase
-        for letter in alphabet:
-            mouth_image_path = f"src/app/mouth_images/{letter}.png"  # Asegúrate de tener las imágenes adecuadas
-            mouth_image = cv2.imread(mouth_image_path)
-            # Convierte la imagen a formato BGR
-            mouth_image_BGR = cv2.cvtColor(mouth_image, cv2.COLOR_RGB2BGR)
-            # Resize the mouth image to match the dimensions of the base image
-            mouth_image = cv2.resize(mouth_image_BGR, (1000, 1200))
-            self.mouth_images[letter] = mouth_image
-
-    def animate_mouth(self, t):
-        audio_chunk = self.audio[t * 1000:(t + 1) * 1000]
-        audio_volume = audio_chunk.rms
-        text = text1  # Replace with your actual text
-        text = text.upper()
-
-        # Asegúrate de que el índice esté dentro de los límites válidos
-        alphabet_index = min(int(t / self.audio.duration_seconds * len(text)), len(text) - 1)
-
-        # Obtiene la letra correspondiente al índice
-        letter = text[alphabet_index]
-        # Obtiene la imagen de la boca correspondiente a la letra
-        mouth_image = self.mouth_images.get(letter, self.mouth_images['A'])
-
-        # Convierte la imagen a formato BGR
-        animated_image = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
-
-        # Sobrepone la imagen de la boca en toda la imagen base
-        animated_image = mouth_image
-
-        return animated_image
+    def animate_frame(self, t):
+        frame_index = int(t / (self.audio.duration_seconds) * len(self.images))
+        frame_index = min(frame_index, len(self.images) - 1)
+        frame_image = cv2.resize(self.images[frame_index], (1000, 1200))
+        return cv2.cvtColor(frame_image, cv2.COLOR_BGR2RGB)
 
     def create_animation(self):
-        video_clip = VideoClip(self.animate_mouth, duration=self.audio.duration_seconds)
-        video_clip.fps = 30  # Establece la velocidad de cuadros por segundo
+        # Calcular la duración promedio por palabra
+        avg_duration_per_word = self.audio.duration_seconds / len(text1)
+
+        # Calcular el speed_factor necesario para alcanzar la duración deseada del video
+        speed_factor = avg_duration_per_word / self.audio.duration_seconds
+
+        # Calculate the adjusted frames per second
+        if len(text1) <= 17:
+            adjusted_fps = 30 * 0.5
+        elif len(text1) <= 64:
+            print(2)
+            adjusted_fps = 30 * 0.2
+        else:
+            adjusted_fps = 30 * 0.02
+
+        # Create a VideoClip with the animated frames
+        video_clip = VideoClip(self.animate_frame, duration=self.audio.duration_seconds)
+
+        # Set adjusted frames per second
+        video_clip.fps = adjusted_fps
+
+        # Write the video file
         video_clip.set_duration(self.audio.duration_seconds).write_videofile(self.output_path, codec='libx264')
+
+        # Obtiene la ruta completa del video generado
+        video_path = os.path.abspath(title)
+
+        # Muestra una ventana emergente indicando que el video se generó con éxito.
+        messagebox.showinfo("Éxito", f"El video se generó con éxito!\nRuta del video: {video_path}.mp4")
 
 """
 if __name__ == "__main__":
